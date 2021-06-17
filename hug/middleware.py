@@ -84,9 +84,8 @@ class SessionMiddleware(object):
         """
         sid = request.cookies.get(self.cookie_name, None)
         data = {}
-        if sid is not None:
-            if self.store.exists(sid):
-                data = self.store.get(sid)
+        if sid is not None and self.store.exists(sid):
+            data = self.store.get(sid)
         request.context.update({self.context_name: data})
 
     def process_response(self, request, response, resource, req_succeeded):
@@ -185,11 +184,12 @@ class CORSMiddleware(object):
             response.set_header("Access-Control-Allow-Origin", origin)
 
         if request.method == "OPTIONS":  # check if we are handling a preflight request
-            allowed_methods = set(
+            allowed_methods = {
                 method
                 for _, routes in self.api.http.routes.items()
                 for method, _ in routes[self.match_route(request.path)].items()
-            )
+            }
+
             allowed_methods.add("OPTIONS")
 
             # return allowed methods

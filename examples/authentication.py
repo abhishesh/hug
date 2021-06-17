@@ -76,10 +76,10 @@ def token_auth_call(user: hug.directives.user):
 @hug.post("/token_generation")  # noqa
 def token_gen_call(username, password):
     """Authenticate and return a token"""
-    secret_key = "super-secret-key-please-change"
     mockusername = "User2"
     mockpassword = "Mypassword"
     if mockpassword == password and mockusername == username:  # This is an example. Don't do that.
+        secret_key = "super-secret-key-please-change"
         return {
             "token": jwt.encode({"user": username, "data": "mydata"}, secret_key, algorithm="HS256")
         }

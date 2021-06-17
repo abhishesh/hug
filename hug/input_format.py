@@ -72,9 +72,12 @@ def urlencoded(body, charset="ascii", **kwargs):
 def multipart(body, content_length=0, **header_params):
     """Converts multipart form data into native Python objects"""
     header_params.setdefault("CONTENT-LENGTH", content_length)
-    if header_params and "boundary" in header_params:
-        if type(header_params["boundary"]) is str:
-            header_params["boundary"] = header_params["boundary"].encode()
+    if (
+        header_params
+        and "boundary" in header_params
+        and type(header_params["boundary"]) is str
+    ):
+        header_params["boundary"] = header_params["boundary"].encode()
 
     form = parse_multipart((body.stream if hasattr(body, "stream") else body), header_params)
     for key, value in form.items():

@@ -128,7 +128,7 @@ class HTTPInterfaceAPI(InterfaceAPI):
             for _url, methods in mapping.items():
                 for _method, versions in methods.items():
                     for _version, handler in versions.items():
-                        if not handler in used:
+                        if handler not in used:
                             used.append(handler)
                             yield handler
 
@@ -203,7 +203,7 @@ class HTTPInterfaceAPI(InterfaceAPI):
                         self.add_exception_handler(exception_type, exception_handler, version)
 
         for input_format, input_format_handler in getattr(http_api, "_input_format", {}).items():
-            if not input_format in getattr(self, "_input_format", {}):
+            if input_format not in getattr(self, "_input_format", {}):
                 self.set_input_format(input_format, input_format_handler)
 
         for version, handler in http_api.not_found_handlers.items():
@@ -236,7 +236,7 @@ class HTTPInterfaceAPI(InterfaceAPI):
             versions_list.remove(None)
         if False in versions_list:
             versions_list.remove(False)
-        if api_version is None and len(versions_list) > 0:
+        if api_version is None and versions_list:
             api_version = max(versions_list)
             documentation["version"] = api_version
         elif api_version is not None:
@@ -249,10 +249,7 @@ class HTTPInterfaceAPI(InterfaceAPI):
                     for version, handler in method_versions.items():
                         if getattr(handler, "private", False):
                             continue
-                        if version is None:
-                            applies_to = versions
-                        else:
-                            applies_to = (version,)
+                        applies_to = versions if version is None else (version, )
                         for version in applies_to:
                             if api_version and version != api_version:
                                 continue
@@ -271,11 +268,7 @@ class HTTPInterfaceAPI(InterfaceAPI):
 
     def serve(self, host="", port=8000, no_documentation=False, display_intro=True):
         """Runs the basic hug development server against this API"""
-        if no_documentation:
-            api = self.server(None)
-        else:
-            api = self.server()
-
+        api = self.server(None) if no_documentation else self.server()
         if display_intro:
             print(INTRO)
 
@@ -433,7 +426,7 @@ class CLIInterfaceAPI(InterfaceAPI):
         """Routes to the correct command line tool"""
         self.api._ensure_started()
         args = sys.argv if args is None else args
-        if not len(args) > 1 or not args[1] in self.commands:
+        if len(args) <= 1 or args[1] not in self.commands:
             print(str(self))
             return sys.exit(1)
 
@@ -634,7 +627,7 @@ class API(object, metaclass=ModuleSingleton):
                     asyncio.gather(*[handler(self) for handler in async_handlers], loop=loop)
                 )
             for startup_handler in self.startup_handlers:
-                if not startup_handler in async_handlers:
+                if startup_handler not in async_handlers:
                     startup_handler(self)
 
     @property

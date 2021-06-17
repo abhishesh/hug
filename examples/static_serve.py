@@ -56,6 +56,6 @@ def setup(api=None):
 def my_static_dirs():
     """Returns static directory names to be served."""
     global tmp_dir_object
-    if tmp_dir_object == None:
+    if tmp_dir_object is None:
         setup()
     return (tmp_dir_object.name,)

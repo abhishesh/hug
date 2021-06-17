@@ -232,10 +232,7 @@ def _camelcase(content):
             new_dictionary[key] = _camelcase(value)
         return new_dictionary
     elif isinstance(content, list):
-        new_list = []
-        for element in content:
-            new_list.append(_camelcase(element))
-        return new_list
+        return [_camelcase(element) for element in content]
     else:
         return content
 

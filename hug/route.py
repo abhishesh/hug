@@ -78,8 +78,10 @@ class Object(http):
                 instance = class_definition()
 
             router = self.urls(
-                urls if urls else "/{0}".format(instance.__class__.__name__.lower()), **route_data
+                urls or "/{0}".format(instance.__class__.__name__.lower()),
+                **route_data
             )
+
             for method in HTTP_METHODS:
                 handler = getattr(instance, method.lower(), None)
                 if handler:

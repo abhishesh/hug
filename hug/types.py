@@ -334,7 +334,7 @@ class OneOf(Type):
         return "Accepts one of the following values: ({0})".format("|".join(self.values))
 
     def __call__(self, value):
-        if not value in self.values:
+        if value not in self.values:
             raise KeyError(
                 "Invalid value passed. The accepted values are: ({0})".format("|".join(self.values))
             )
@@ -355,7 +355,7 @@ class Mapping(OneOf):
         return "Accepts one of the following values: ({0})".format("|".join(self.values))
 
     def __call__(self, value):
-        if not value in self.values:
+        if value not in self.values:
             raise KeyError(
                 "Invalid value passed. The accepted values are: ({0})".format("|".join(self.values))
             )
@@ -373,15 +373,15 @@ class JSON(Type):
                 return json_converter.loads(value)
             except Exception:
                 raise ValueError("Incorrectly formatted JSON provided")
-        if type(value) is list:
-            # If Falcon is set to comma-separate entries, this segment joins them again.
-            try:
-                fixed_value = ",".join(value)
-                return json_converter.loads(fixed_value)
-            except Exception:
-                raise ValueError("Incorrectly formatted JSON provided")
-        else:
+        if type(value) is not list:
             return value
+
+        # If Falcon is set to comma-separate entries, this segment joins them again.
+        try:
+            fixed_value = ",".join(value)
+            return json_converter.loads(fixed_value)
+        except Exception:
+            raise ValueError("Incorrectly formatted JSON provided")
 
 
 class Multi(Type):
@@ -446,7 +446,7 @@ class LessThan(Type):
 
     def __call__(self, value):
         value = self.convert(value)
-        if not value < self.limit:
+        if value >= self.limit:
             raise ValueError("'{0}' must be less than {1}".format(value, self.limit))
         return value
 
@@ -466,7 +466,7 @@ class GreaterThan(Type):
 
     def __call__(self, value):
         value = self.convert(value)
-        if not value > self.minimum:
+        if value <= self.minimum:
             raise ValueError("'{0}' must be greater than {1}".format(value, self.minimum))
         return value
 
@@ -517,7 +517,7 @@ class ShorterThan(Type):
     def __call__(self, value):
         value = self.convert(value)
         length = len(value)
-        if not length < self.limit:
+        if length >= self.limit:
             raise ValueError(
                 "'{0}' is longer then the allowed limit of {1}".format(value, self.limit)
             )
@@ -540,7 +540,7 @@ class LongerThan(Type):
     def __call__(self, value):
         value = self.convert(value)
         length = len(value)
-        if not length > self.limit:
+        if length <= self.limit:
             raise ValueError("'{0}' must be longer than {1}".format(value, self.limit))
         return value
 

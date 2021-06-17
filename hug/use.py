@@ -229,7 +229,7 @@ class Socket(Service):
         connect_to = tuple(connect_to) if proto in Socket.inet else connect_to
         self.timeout = timeout
         self.connection = Socket.Connection(connect_to, proto, set())
-        self.connection_pool = Queue(maxsize=pool if pool else 1)
+        self.connection_pool = Queue(maxsize=pool or 1)
 
         if proto in Socket.streams:
             self.send_and_receive = self._stream_send_and_receive

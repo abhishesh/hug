@@ -34,7 +34,7 @@ def make_simple_query(db: SqlalchemySession):
         test_model.name = word
         db.add(test_model)
         db.flush()
-    return " ".join([obj.name for obj in db.query(TestModel).all()])
+    return " ".join(obj.name for obj in db.query(TestModel).all())
 
 
 @hug.get("/hello2")

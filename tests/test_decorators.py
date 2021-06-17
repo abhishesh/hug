@@ -1452,8 +1452,7 @@ def test_cli_using_method():
             hug.cli()(self.hello_world_method)
 
         def hello_world_method(self):
-            variable = "Hello World!"
-            return variable
+            return "Hello World!"
 
     api_instance = API()
     assert api_instance.hello_world_method() == "Hello World!"
@@ -1477,7 +1476,6 @@ def test_cli_with_exception():
     @hug.cli()
     def test():
         raise ValueError()
-        return "Hi!"
 
     assert hug.test.cli(test) != "Hi!"
 
@@ -1663,7 +1661,7 @@ def test_validate():
     """Test to ensure hug's secondary validation mechanism works as expected"""
 
     def contains_either(fields):
-        if not "one" in fields and not "two" in fields:
+        if "one" not in fields and "two" not in fields:
             return {"one": "must be defined", "two": "must be defined"}
 
     @hug.get(validate=contains_either)

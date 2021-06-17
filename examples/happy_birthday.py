@@ -14,9 +14,9 @@ def greet(event: str):
     greetings = "Happy"
     if event == "Christmas":
         greetings = "Merry"
-    if event == "Kwanzaa":
+    elif event == "Kwanzaa":
         greetings = "Joyous"
-    if event == "wishes":
+    elif event == "wishes":
         greetings = "Warm"
 
     return "{greetings} {event}!".format(**locals())

@@ -72,7 +72,7 @@ def call(
         body = output_format.json(body)
         headers.setdefault("content-type", "application/json")
 
-    params = params if params else {}
+    params = params or {}
     params.update(kwargs)
     if params:
         query_string = "{}{}{}".format(
@@ -120,7 +120,7 @@ def cli(method, *args, api=None, module=None, **arguments):
             values = (values,)
         for value in values:
             command_args.append("--{0}".format(name))
-            if not value in (True, False):
+            if value not in (True, False):
                 command_args.append("{0}".format(value))
 
     old_sys_argv = sys.argv

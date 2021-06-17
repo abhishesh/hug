@@ -99,11 +99,7 @@ class Interfaces(object):
         if self.spec is not function:
             self.all_parameters.update(self.arguments)
 
-        if args is not None:
-            transformers = args
-        else:
-            transformers = self.spec.__annotations__
-
+        transformers = args if args is not None else self.spec.__annotations__
         self.transform = transformers.get("return", None)
         self.directives = {}
         self.input_transformations = {}
@@ -176,7 +172,7 @@ class Interface(object):
         if "output_invalid" in route:
             self.invalid_outputs = route["output_invalid"]
 
-        if not "parameters" in route:
+        if "parameters" not in route:
             self.defaults = self.interface.defaults
             self.parameters = self.interface.parameters
             self.all_parameters = self.interface.all_parameters
@@ -186,8 +182,11 @@ class Interface(object):
             self.parameters = tuple(route["parameters"])
             self.all_parameters = set(route["parameters"])
             self.required = tuple(
-                [parameter for parameter in self.parameters if parameter not in self.defaults]
+                parameter
+                for parameter in self.parameters
+                if parameter not in self.defaults
             )
+
 
         if "map_params" in route:
             self.map_params = route["map_params"]
@@ -204,11 +203,10 @@ class Interface(object):
                     self.all_parameters.add(interface_name)
                 if internal_name in self.required:
                     self.required = tuple(
-                        [
-                            interface_name if param == internal_name else param
-                            for param in self.required
-                        ]
+                        interface_name if param == internal_name else param
+                        for param in self.required
                     )
+
 
             reverse_mapping = {
                 internal: interface for interface, internal in self.map_params.items()
@@ -284,7 +282,7 @@ class Interface(object):
                     else:
                         errors[key] = str(error)
         for require in self.required:
-            if not require in input_parameters:
+            if require not in input_parameters:
                 errors[require] = "Required parameter '{}' not supplied".format(require)
         if not errors and getattr(self, "validate_function", False):
             errors = self.validate_function(input_parameters)
@@ -321,11 +319,12 @@ class Interface(object):
         parameters = [
             param
             for param in self.parameters
-            if not param in ("request", "response", "self")
-            and not param in ("api_version", "body")
+            if param not in ("request", "response", "self")
+            and param not in ("api_version", "body")
             and not param.startswith("hug_")
             and not hasattr(param, "directive")
         ]
+
         if parameters:
             inputs = doc.setdefault("inputs", OrderedDict())
             types = self.interface.spec.__annotations__
@@ -867,11 +866,10 @@ class HTTP(Interface):
                 response.status = falcon.HTTP_206
                 response.content_range = (start, end, size)
                 content.close()
+            elif size:
+                response.set_stream(content, size)
             else:
-                if size:
-                    response.set_stream(content, size)
-                else:
-                    response.stream = content  # pragma: no cover
+                response.stream = content  # pragma: no cover
         else:
             response.data = content
 
@@ -962,7 +960,7 @@ class HTTP(Interface):
             if isinstance(example, str):
                 example_text += "?{0}".format(example)
             doc_examples = doc.setdefault("examples", [])
-            if not example_text in doc_examples:
+            if example_text not in doc_examples:
                 doc_examples.append(example_text)
 
         doc = super().documentation(doc)
@@ -980,15 +978,18 @@ class HTTP(Interface):
             for url, methods in routes.items():
                 for _method, versions in methods.items():
                     for interface_version, interface in versions.items():
-                        if interface_version == version and interface == self:
-                            if not url in urls:
-                                urls.append(("/v{0}".format(version) if version else "") + url)
+                        if (
+                            interface_version == version
+                            and interface == self
+                            and url not in urls
+                        ):
+                            urls.append(("/v{0}".format(version) if version else "") + url)
         return urls
 
     def url(self, version=None, **kwargs):
         """Returns the first matching URL found for the specified arguments"""
         for url in self.urls(version):
-            if [key for key in kwargs.keys() if not "{" + key + "}" in url]:
+            if [key for key in kwargs.keys() if "{" + key + "}" not in url]:
                 continue
 
             return url.format(**kwargs)

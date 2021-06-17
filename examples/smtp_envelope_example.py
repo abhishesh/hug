@@ -6,7 +6,7 @@ import hug
 class SMTP(object):
     def __init__(self, *args, **kwargs):
         self.smtp = envelopes.SMTP(host="127.0.0.1")
-        self.envelopes_to_send = list()
+        self.envelopes_to_send = []
 
     def send_envelope(self, envelope):
         self.envelopes_to_send.append(envelope)

@@ -72,7 +72,7 @@ def module(default=None, api=None, **kwargs):
 @_built_in_directive
 def api(default=None, api=None, **kwargs):
     """Returns the api instance in which this API function is being ran"""
-    return api if api else default
+    return api or default
 
 
 @_built_in_directive

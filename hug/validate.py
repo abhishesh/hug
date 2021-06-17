@@ -60,10 +60,7 @@ def contains_one_of(*fields):
             if field in endpoint_fields:
                 return
 
-        errors = {}
-        for field in fields:
-            errors[field] = "one of these must have a value"
-        return errors
+        return {field: "one of these must have a value" for field in fields}
 
     check_contains.__doc__ = message
     return check_contains
